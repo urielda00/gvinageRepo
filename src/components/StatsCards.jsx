@@ -22,14 +22,17 @@ function isReviewRawStatus(order) {
   return String(order?.status || '').toLowerCase() === 'review'
 }
 
+function isAutomationIssueStatus(log) {
+  return ['error', 'blocked'].includes(String(log?.status || '').toLowerCase())
+}
+
 export default function StatsCards({ orders, logs }) {
   const newOrders = orders.filter((order) => isNewRawStatus(order))
 
   const reviewOrders = orders.filter((order) => isReviewRawStatus(order))
 
   const lastWeekErrors = logs.filter(
-    (log) =>
-      String(log.status).toLowerCase() === 'error' && isLastSevenDays(log.created_at)
+    (log) => isAutomationIssueStatus(log) && isLastSevenDays(log.created_at)
   )
 
   const values = orders

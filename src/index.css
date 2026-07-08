@@ -437,6 +437,11 @@ textarea {
   background: color-mix(in srgb, var(--danger) 13%, var(--surface));
 }
 
+.badge--blocked {
+  color: var(--warning);
+  background: color-mix(in srgb, var(--warning) 15%, var(--surface));
+}
+
 .badge--handled {
   color: var(--info);
   background: color-mix(in srgb, var(--info) 13%, var(--surface));
