@@ -1,6 +1,6 @@
 import EmptyState from './EmptyState'
 import StatusBadge from './StatusBadge'
-import { fallback, formatConfidence, formatDate } from '../utils/formatters'
+import { fallback, formatDate } from '../utils/formatters'
 
 export default function OrdersTable({ orders, onSelect, onStatus }) {
   if (!orders.length) {
@@ -13,13 +13,8 @@ export default function OrdersTable({ orders, onSelect, onStatus }) {
         <thead>
           <tr>
             <th>סטטוס</th>
-            <th>לקוח</th>
-            <th>טלפון</th>
             <th>מייל</th>
-            <th>סוג פעולה</th>
-            <th>ביטחון AI</th>
             <th>תאריך</th>
-            <th>הערות</th>
             <th>פעולות</th>
           </tr>
         </thead>
@@ -27,23 +22,14 @@ export default function OrdersTable({ orders, onSelect, onStatus }) {
         <tbody>
           {orders.map((order, index) => (
             <tr key={order.id ?? order.email_id ?? index} onClick={() => onSelect(order)}>
-              <td>
+              <td data-label="סטטוס">
                 <StatusBadge order={order} />
               </td>
-              <td className="cell-strong">{fallback(order.customer_name)}</td>
-              <td dir="ltr">{fallback(order.customer_phone)}</td>
-              <td dir="ltr" className="email-cell">
+              <td data-label="מייל" dir="ltr" className="email-cell">
                 {fallback(order.customer_email)}
               </td>
-              <td>{fallback(order.action_type)}</td>
-              <td>{formatConfidence(order.confidence)}</td>
-              <td>{formatDate(order.created_at)}</td>
-              <td>
-                <span className="notes-preview" title={order.notes || ''}>
-                  {fallback(order.notes)}
-                </span>
-              </td>
-              <td>
+              <td data-label="תאריך">{formatDate(order.created_at)}</td>
+              <td data-label="פעולות">
                 <div className="row-actions" onClick={(event) => event.stopPropagation()}>
                   <button onClick={() => onSelect(order)}>פרטים</button>
                   <button onClick={() => onStatus(order, 'handled')}>סמן כטופל</button>

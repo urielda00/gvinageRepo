@@ -32,6 +32,41 @@ export function hasMissingFields(value) {
   return String(value).trim().length > 0 && String(value).trim() !== '[]'
 }
 
+export function normalizeMissingFields(value) {
+  if (!value) return []
+
+  if (Array.isArray(value)) {
+    return value
+  }
+
+  if (typeof value === 'string') {
+    try {
+      const parsed = JSON.parse(value)
+
+      if (Array.isArray(parsed)) {
+        return parsed
+      }
+
+      if (parsed && typeof parsed === 'object') {
+        return Object.keys(parsed).filter((key) => Boolean(parsed[key]))
+      }
+
+      return []
+    } catch {
+      return value
+        .split(',')
+        .map((field) => field.trim())
+        .filter(Boolean)
+    }
+  }
+
+  if (typeof value === 'object') {
+    return Object.keys(value).filter((key) => Boolean(value[key]))
+  }
+
+  return []
+}
+
 export function getOrderState(order = {}) {
   const status = String(order.status || '').toLowerCase()
   if (status === 'error' || order.error_message) return 'error'

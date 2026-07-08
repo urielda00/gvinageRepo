@@ -1,7 +1,12 @@
 import { useEffect, useState } from 'react'
 import ErrorNotice from './ErrorNotice'
 import ItemsListDisplay from './ItemsListDisplay'
-import { fallback, formatConfidence, formatValue } from '../utils/formatters'
+import {
+  confidenceNumber,
+  fallback,
+  formatConfidence,
+  normalizeMissingFields,
+} from '../utils/formatters'
 
 const editableFields = [
   ['customer_name', 'שם לקוח'],
@@ -18,6 +23,32 @@ const statusOptions = [
   ['error', 'שגיאה'],
 ]
 
+const missingFieldLabels = {
+  customerName: 'Customer name',
+  customerPhone: 'Customer phone',
+  deliveryAddress: 'Delivery address',
+  customerEmail: 'Customer email',
+  items: 'Items',
+}
+
+function getConfidenceLevel(value) {
+  if (value === null) {
+    return { label: 'Unknown', className: 'unknown', width: 0 }
+  }
+
+  const bounded = Math.max(0, Math.min(100, Math.round(value)))
+
+  if (bounded < 60) {
+    return { label: 'Low', className: 'low', width: bounded }
+  }
+
+  if (bounded < 85) {
+    return { label: 'Medium', className: 'medium', width: bounded }
+  }
+
+  return { label: 'High', className: 'high', width: bounded }
+}
+
 export default function OrderDetailsModal({ order, onClose, onUpdate, onDelete }) {
   const [form, setForm] = useState(() => ({
     customer_name: order.customer_name || '',
@@ -32,6 +63,9 @@ export default function OrderDetailsModal({ order, onClose, onUpdate, onDelete }
   const [technicalOpen, setTechnicalOpen] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  const missingFields = normalizeMissingFields(order.missing_fields)
+  const confidence = confidenceNumber(order.confidence)
+  const confidenceLevel = getConfidenceLevel(confidence)
 
   useEffect(() => {
     const close = (event) => {
@@ -150,14 +184,37 @@ export default function OrderDetailsModal({ order, onClose, onUpdate, onDelete }
           </label>
         </div>
 
-        <div className="read-only-summary">
-          <span>
-            ביטחון AI: <b>{formatConfidence(order.confidence)}</b>
-          </span>
+        <div className="order-insights">
+          <div className="confidence-summary">
+            <div>
+              <span>AI confidence</span>
+              <strong>{formatConfidence(order.confidence)}</strong>
+            </div>
 
-          <span>
-            שדות חסרים: <b>{formatValue(order.missing_fields)}</b>
-          </span>
+            <span className={`confidence-level confidence-level--${confidenceLevel.className}`}>
+              {confidenceLevel.label}
+            </span>
+
+            <div className="confidence-meter" aria-hidden="true">
+              <span style={{ width: `${confidenceLevel.width}%` }} />
+            </div>
+          </div>
+
+          <div className="missing-fields-summary">
+            <h3>Missing order details</h3>
+
+            {missingFields.length ? (
+              <div className="missing-fields-list">
+                {missingFields.map((field) => (
+                  <span className="missing-field-chip" key={field}>
+                    {missingFieldLabels[field] || field}
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <p>No missing details</p>
+            )}
+          </div>
         </div>
 
         <div className="detail-block">
@@ -233,15 +290,6 @@ export default function OrderDetailsModal({ order, onClose, onUpdate, onDelete }
               <code>{fallback(order.email_id)}</code>
             </div>
 
-            <div>
-              <span>raw_json</span>
-              <pre>{formatValue(order.raw_json)}</pre>
-            </div>
-
-            <div>
-              <span>items_list</span>
-              <pre>{formatValue(order.items_list)}</pre>
-            </div>
           </div>
         )}
       </section>

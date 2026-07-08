@@ -9,9 +9,53 @@ import LoadingState from '../components/LoadingState'
 import ErrorNotice from '../components/ErrorNotice'
 import Toast from '../components/Toast'
 import ConfirmDialog from '../components/ConfirmDialog'
+import { normalizeItemsList, normalizeMissingFields } from '../utils/formatters'
 
 function getRawOrderStatus(order) {
   return String(order?.status || '').toLowerCase()
+}
+
+function hasValue(value) {
+  return value !== null && value !== undefined && String(value).trim().length > 0
+}
+
+function hasValidItems(itemsList) {
+  return normalizeItemsList(itemsList).some((item) => {
+    if (typeof item === 'string') {
+      return hasValue(item)
+    }
+
+    if (!item || typeof item !== 'object') {
+      return false
+    }
+
+    return hasValue(item.name) && hasValue(item.quantity)
+  })
+}
+
+const knownMissingFields = [
+  ['customerName', (order) => hasValue(order.customer_name)],
+  ['customerPhone', (order) => hasValue(order.customer_phone)],
+  ['customerEmail', (order) => hasValue(order.customer_email)],
+  ['deliveryAddress', (order) => hasValue(order.shipping_address)],
+  ['items', (order) => hasValidItems(order.items_list)],
+]
+
+function syncMissingFields(order, patch) {
+  const merged = { ...order, ...patch }
+  const currentMissingFields = normalizeMissingFields(order.missing_fields)
+  const knownKeys = new Set(knownMissingFields.map(([key]) => key))
+  const nextMissingFields = currentMissingFields.filter((field) => !knownKeys.has(field))
+
+  knownMissingFields.forEach(([key, hasValidValue]) => {
+    if (!hasValidValue(merged)) {
+      nextMissingFields.push(key)
+    }
+  })
+
+  const uniqueMissingFields = [...new Set(nextMissingFields)]
+
+  return uniqueMissingFields
 }
 
 export default function DashboardPage() {
@@ -103,6 +147,7 @@ export default function DashboardPage() {
 
   async function updateOrder(order, patch) {
     const safe = {}
+    const nextMissingFields = syncMissingFields(order, patch)
 
     ;[
       'customer_name',
@@ -118,6 +163,10 @@ export default function DashboardPage() {
         safe[key] = patch[key]
       }
     })
+
+    if (nextMissingFields) {
+      safe.missing_fields = nextMissingFields
+    }
 
     const { data, error: updateError } = await supabase
       .from('orders')
