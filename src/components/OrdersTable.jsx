@@ -7,8 +7,10 @@ export default function OrdersTable({ orders, onSelect, onStatus }) {
     return <EmptyState>לא נמצאו הזמנות התואמות לחיפוש.</EmptyState>
   }
 
+  const tableWrapClassName = orders.length > 7 ? 'table-wrap table-wrap--scroll' : 'table-wrap'
+
   return (
-    <div className="table-wrap">
+    <div className={tableWrapClassName}>
       <table className="orders-table">
         <thead>
           <tr>

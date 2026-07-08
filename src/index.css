@@ -303,6 +303,14 @@ textarea {
   margin: 0 -22px -22px;
 }
 
+.table-wrap--scroll {
+  max-height: 378px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+
 .orders-table {
   width: 100%;
   min-width: 0;
@@ -317,6 +325,12 @@ textarea {
   text-align: right;
   padding: 9px 10px;
   border-block: 1px solid var(--border);
+}
+
+.table-wrap--scroll .orders-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 
 .orders-table td {
@@ -1068,6 +1082,10 @@ pre {
 
   .table-wrap {
     margin: 0 -16px -16px;
+  }
+
+  .table-wrap--scroll {
+    max-height: 640px;
   }
 
   .orders-table {
