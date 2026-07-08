@@ -278,7 +278,6 @@ export default function DashboardPage() {
                 orders={filtered}
                 onSelect={setSelected}
                 onStatus={changeStatus}
-                onDelete={deleteOrder}
               />
             </section>
           ) : (

@@ -357,7 +357,7 @@ textarea {
 .row-actions {
   display: flex;
   gap: 6px;
-  min-width: 300px;
+  min-width: 170px;
   flex-wrap: nowrap;
   align-items: center;
   white-space: nowrap;
@@ -387,33 +387,6 @@ textarea {
 .row-actions button:active {
   transform: translateY(0);
   box-shadow: 0 1px 4px rgba(31, 41, 55, 0.1);
-}
-
-.row-actions .danger-link {
-  color: var(--danger);
-  border-color: color-mix(in srgb, var(--danger) 30%, var(--border));
-  background: color-mix(in srgb, var(--danger) 6%, var(--surface));
-}
-
-.row-actions .danger-link:hover {
-  border-color: color-mix(in srgb, var(--danger) 55%, var(--border));
-  background: color-mix(in srgb, var(--danger) 11%, var(--surface));
-}
-
-.row-actions button:active {
-  transform: translateY(0);
-  box-shadow: 0 1px 4px rgba(31, 41, 55, 0.1);
-}
-
-.row-actions .danger-link {
-  color: var(--danger);
-  border-color: color-mix(in srgb, var(--danger) 30%, var(--border));
-  background: color-mix(in srgb, var(--danger) 6%, var(--surface));
-}
-
-.row-actions .danger-link:hover {
-  border-color: color-mix(in srgb, var(--danger) 55%, var(--border));
-  background: color-mix(in srgb, var(--danger) 11%, var(--surface));
 }
 
 .badge {
@@ -973,14 +946,14 @@ pre {
   }
 
   .row-actions {
-  min-width: 280px;
-  flex-wrap: nowrap;
-}
+    min-width: 170px;
+    flex-wrap: nowrap;
+  }
 
-.row-actions button {
-  padding: 7px 8px;
-  font-size: 0.7rem;
-}
+  .row-actions button {
+    padding: 7px 8px;
+    font-size: 0.7rem;
+  }
 
   .items-table-wrap {
     overflow: visible;
