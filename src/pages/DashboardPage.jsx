@@ -9,7 +9,10 @@ import LoadingState from '../components/LoadingState'
 import ErrorNotice from '../components/ErrorNotice'
 import Toast from '../components/Toast'
 import ConfirmDialog from '../components/ConfirmDialog'
-import { getOrderState } from '../utils/formatters'
+
+function getRawOrderStatus(order) {
+  return String(order?.status || '').toLowerCase()
+}
 
 export default function DashboardPage() {
   const [orders, setOrders] = useState([])
@@ -84,7 +87,7 @@ export default function DashboardPage() {
             .includes(needle)
         )
 
-      const status = filter === 'all' || getOrderState(order) === filter
+      const status = filter === 'all' || getRawOrderStatus(order) === filter
 
       const time = order.created_at ? new Date(order.created_at).getTime() : 0
 

@@ -1,4 +1,4 @@
-import { confidenceNumber, getOrderState } from '../utils/formatters'
+import { confidenceNumber } from '../utils/formatters'
 
 function isLastSevenDays(value) {
   if (!value) {
@@ -18,12 +18,14 @@ function isNewRawStatus(order) {
   return String(order?.status || '').toLowerCase() === 'new'
 }
 
+function isReviewRawStatus(order) {
+  return String(order?.status || '').toLowerCase() === 'review'
+}
+
 export default function StatsCards({ orders, logs }) {
   const newOrders = orders.filter((order) => isNewRawStatus(order))
 
-  const newOrdersForReview = orders.filter(
-    (order) => isNewRawStatus(order) && getOrderState(order) === 'review'
-  )
+  const reviewOrders = orders.filter((order) => isReviewRawStatus(order))
 
   const lastWeekErrors = logs.filter(
     (log) =>
@@ -40,7 +42,7 @@ export default function StatsCards({ orders, logs }) {
 
   const cards = [
     ['📦', 'הזמנות חדשות', newOrders.length, 'סטטוס חדש בלבד'],
-    ['⚠️', 'דורשות בדיקה', newOrdersForReview.length, 'רק הזמנות חדשות'],
+    ['⚠️', 'דורשות בדיקה', reviewOrders.length, 'סטטוס דורש בדיקה בלבד'],
     ['❌', 'שגיאות אוטומציה', lastWeekErrors.length, 'ב-7 הימים האחרונים'],
     ['🤖', 'ביטחון AI ממוצע', average, 'לפי נתונים זמינים'],
   ]
