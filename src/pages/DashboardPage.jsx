@@ -172,7 +172,7 @@ export default function DashboardPage() {
       .from('orders')
       .update(safe)
       .eq('id', order.id)
-      .select()
+      .select('*')
       .single()
 
     if (updateError) {

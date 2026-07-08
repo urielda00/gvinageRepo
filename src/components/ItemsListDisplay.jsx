@@ -4,8 +4,46 @@ import { normalizeItemsList } from '../utils/formatters'
 const displayValue = (value) =>
   value === null || value === undefined || value === '' ? '-' : String(value)
 
+function getItemValue(item, keys) {
+  if (!item || typeof item !== 'object') return ''
+
+  const key = keys.find(
+    (field) => item[field] !== null && item[field] !== undefined && item[field] !== '',
+  )
+
+  return key ? item[key] : ''
+}
+
+function toDisplayItem(item) {
+  if (typeof item === 'string') {
+    return {
+      name: item,
+      quantity: '',
+      unit: '',
+      notes: '',
+    }
+  }
+
+  if (!item || typeof item !== 'object') {
+    return {
+      name: '',
+      quantity: '',
+      unit: '',
+      notes: '',
+    }
+  }
+
+  return {
+    name: getItemValue(item, ['name', 'product_name', 'product', 'title', 'item']),
+    quantity: getItemValue(item, ['quantity', 'qty', 'amount']),
+    unit: getItemValue(item, ['unit', 'unit_type', 'measure']),
+    notes: getItemValue(item, ['notes', 'note', 'comment', 'comments']),
+  }
+}
+
 export default function ItemsListDisplay({ itemsList, onSave }) {
   const normalizedItems = normalizeItemsList(itemsList)
+  const displayItems = normalizedItems.map(toDisplayItem)
   const [editing, setEditing] = useState(false)
   const [draftItems, setDraftItems] = useState(normalizedItems)
   const [saving, setSaving] = useState(false)
@@ -44,15 +82,15 @@ export default function ItemsListDisplay({ itemsList, onSave }) {
     </div>
   </section>
 
-  const hasNotes = normalizedItems.some(
-    (item) => item && typeof item === 'object' && item.notes !== null && item.notes !== undefined && item.notes !== '',
+  const hasNotes = displayItems.some(
+    (item) => item.notes !== null && item.notes !== undefined && item.notes !== '',
   )
 
   return <section className="items-section" aria-labelledby="items-section-title">
     <div className="items-section-heading"><h3 id="items-section-title">פרטי מוצרים</h3>{onSave && <button className="button button--secondary" onClick={() => { setDraftItems(normalizedItems.map((item) => ({...item}))); setError(''); setEditing(true) }}>עריכת מוצרים</button>}</div>
     {normalizedItems.length === 0 ? (
       <div className="items-warning" role="status">
-        לא ניתן להציג את רשימת המוצרים בצורה מסודרת
+        אין פריטי מוצרים להצגה
       </div>
     ) : (
       <div className="items-table-wrap">
@@ -66,8 +104,7 @@ export default function ItemsListDisplay({ itemsList, onSave }) {
             </tr>
           </thead>
           <tbody>
-            {normalizedItems.map((item, index) => {
-              const product = item && typeof item === 'object' ? item : {}
+            {displayItems.map((product, index) => {
               return <tr key={index}>
                 <td data-label="מוצר">{displayValue(product.name)}</td>
                 <td data-label="כמות">{displayValue(product.quantity)}</td>

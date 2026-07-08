@@ -5,6 +5,7 @@ import {
   confidenceNumber,
   fallback,
   formatConfidence,
+  formatValue,
   normalizeMissingFields,
 } from '../utils/formatters'
 
@@ -290,6 +291,15 @@ export default function OrderDetailsModal({ order, onClose, onUpdate, onDelete }
               <code>{fallback(order.email_id)}</code>
             </div>
 
+            <div>
+              <span>items_list</span>
+              <pre>{formatValue(order.items_list ?? [])}</pre>
+            </div>
+
+            <div>
+              <span>raw_json</span>
+              <pre>{formatValue(order.raw_json)}</pre>
+            </div>
           </div>
         )}
       </section>
