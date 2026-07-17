@@ -252,23 +252,34 @@ export default function DashboardPage() {
     setDeleteOrderError('')
 
     try {
-      const { error: deleteError } = await supabase
+      const { data: deletedOrder, error: deleteError } = await supabase
         .from('orders')
         .delete()
         .eq('id', orderToDelete.id)
+        .select('id')
+        .single()
 
       if (deleteError) {
         throw deleteError
       }
 
+      if (deletedOrder.id !== orderToDelete.id) {
+        throw new Error('The delete response did not match the requested order.')
+      }
+
       setOrders((currentOrders) =>
-        currentOrders.filter((currentOrder) => currentOrder.id !== orderToDelete.id)
+        currentOrders.filter((currentOrder) => currentOrder.id !== deletedOrder.id)
       )
 
       setSelected(null)
       setOrderToDelete(null)
       setToast({ message: 'ההזמנה נמחקה' })
-    } catch {
+    } catch (deleteError) {
+      console.error('Failed to delete order from Supabase', {
+        orderId: orderToDelete.id,
+        code: deleteError?.code,
+        message: deleteError?.message,
+      })
       setDeleteOrderError('לא ניתן למחוק את ההזמנה כרגע. ייתכן שאין הרשאה או שיש בעיית חיבור.')
     } finally {
       setDeletingOrder(false)
