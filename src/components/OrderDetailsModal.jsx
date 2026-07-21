@@ -14,6 +14,7 @@ const editableFields = [
   ['customer_phone', 'טלפון'],
   ['customer_email', 'מייל'],
   ['shipping_address', 'כתובת למשלוח'],
+  ['delivery_date', 'תאריך משלוח'],
   ['action_type', 'סוג פעולה'],
 ]
 
@@ -28,6 +29,7 @@ const missingFieldLabels = {
   customerName: 'Customer name',
   customerPhone: 'Customer phone',
   deliveryAddress: 'Delivery address',
+  deliveryDate: 'תאריך משלוח',
   customerEmail: 'Customer email',
   items: 'Items',
 }
@@ -56,6 +58,7 @@ export default function OrderDetailsModal({ order, onClose, onUpdate, onDelete }
     customer_phone: order.customer_phone || '',
     customer_email: order.customer_email || '',
     shipping_address: order.shipping_address || '',
+    delivery_date: order.delivery_date || '',
     action_type: order.action_type || '',
     status: order.status || 'new',
     notes: order.notes || '',
@@ -141,6 +144,7 @@ export default function OrderDetailsModal({ order, onClose, onUpdate, onDelete }
               <input
                 dir={key.includes('phone') || key.includes('email') ? 'ltr' : 'rtl'}
                 value={form[key]}
+                placeholder={key === 'delivery_date' ? 'לא צוין' : undefined}
                 onChange={(event) =>
                   setForm({
                     ...form,

@@ -9,11 +9,7 @@ import LoadingState from '../components/LoadingState'
 import ErrorNotice from '../components/ErrorNotice'
 import Toast from '../components/Toast'
 import ConfirmDialog from '../components/ConfirmDialog'
-import { normalizeItemsList, normalizeMissingFields } from '../utils/formatters'
-
-function getRawOrderStatus(order) {
-  return String(order?.status || '').toLowerCase()
-}
+import { getOrderState, normalizeItemsList, normalizeMissingFields } from '../utils/formatters'
 
 function hasValue(value) {
   return value !== null && value !== undefined && String(value).trim().length > 0
@@ -124,6 +120,7 @@ export default function DashboardPage() {
           'customer_phone',
           'customer_email',
           'shipping_address',
+          'delivery_date',
           'action_type',
         ].some((key) =>
           String(order[key] ?? '')
@@ -131,7 +128,7 @@ export default function DashboardPage() {
             .includes(needle)
         )
 
-      const status = filter === 'all' || getRawOrderStatus(order) === filter
+      const status = filter === 'all' || getOrderState(order) === filter
 
       const time = order.created_at ? new Date(order.created_at).getTime() : 0
 
